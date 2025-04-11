@@ -48,7 +48,7 @@ RUN pip install nbgitpuller && \
 
 RUN conda install -y -c conda-forge libwebp
 
-RUN conda install -y -c conda-forge --freeze-installed jupyter-server-proxy jupyter-rsession-proxy udunits2 imagemagick pandas numpy r-igraph && \
+RUN conda install -y -c conda-forge --freeze-installed jupyterthemes udunits2 imagemagick pandas numpy r-igraph && \
     conda clean --all
 
 RUN pip install matplotlib
