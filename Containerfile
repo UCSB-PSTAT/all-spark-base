@@ -53,6 +53,8 @@ RUN conda install -y -c conda-forge --freeze-installed jupyterthemes jupyter-ser
 
 RUN pip install matplotlib
 
+RUN jupyter serverextension enable --sys-prefix jupyter_server_proxy
+
 # Inject Compiler flags for R
 RUN R -e "dotR <- file.path(Sys.getenv('HOME'), '.R'); if(!file.exists(dotR)){ dir.create(dotR) }; Makevars <- file.path(dotR, 'Makevars'); if (!file.exists(Makevars)){  file.create(Makevars) }; cat('\nCXX14FLAGS=-O3 -fPIC -Wno-unused-variable -Wno-unused-function', 'CXX14 = g++ -std=c++1y -fPIC', 'CXX = g++', 'CXX11 = g++', 'CC = gcc','FC = /usr/bin/gfortran', file = Makevars, sep = '\n', append = TRUE)"
 
