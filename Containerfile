@@ -66,6 +66,12 @@ RUN R -e "devtools::install_github('gbm-developers/gbm3')"
 
 RUN R -e "devtools::install_github('ucbds-infra/ottr@stable')"
 
+COPY extra_config.py /tmp/
+
+COPY spark-logo-rev.svg /opt/
+
+RUN cat /tmp/extra_config.py >> /etc/jupyter/jupyter_server_config.py
+
 RUN /usr/local/bin/fix-permissions "${CONDA_DIR}" || true
 
 RUN chown -R jovyan:users /home/jovyan
