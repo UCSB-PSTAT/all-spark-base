@@ -3,7 +3,7 @@ c.ServerProxy.servers = {
         "command" : ["python3", "-c", "from pyspark.context import SparkContext; SparkContext()"],
         "port" : 4040,
         "absolute_url": False,
-        "timout" : 3600,
+        "timeout" : 3600,
         "launcher_entry": {
                 "enabled": True,
                 "icon_path": "/opt/spark-logo-rev.svg",
