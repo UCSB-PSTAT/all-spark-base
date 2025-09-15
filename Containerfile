@@ -1,4 +1,4 @@
-FROM quay.io/jupyter/all-spark-notebook:spark-3.5.3
+FROM quay.io/jupyter/all-spark-notebook:spark-4.0.1
 
 LABEL maintainer="LSIT Systems <lsitops@ucsb.edu>"
 
