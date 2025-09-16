@@ -40,6 +40,9 @@ RUN apt update -qq && \
         libnlopt-dev \
         libboost-all-dev \
         liblzma-dev \
+        libfreetype-dev \
+        libfreetype6 \
+        libfreetype6-dev \
         wget \
         lmodern && \
         apt-get clean
