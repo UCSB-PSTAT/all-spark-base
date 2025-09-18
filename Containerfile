@@ -1,4 +1,4 @@
-FROM quay.io/jupyter/all-spark-notebook:spark-4.0.1
+FROM quay.io/jupyter/all-spark-notebook:spark-3.5.3
 
 LABEL maintainer="LSIT Systems <lsitops@ucsb.edu>"
 
@@ -8,53 +8,48 @@ RUN apt update -qq && \
     apt install software-properties-common -y && \
     apt update -qq && \
     apt upgrade -y && \
-    apt install -y \
-        jq \
-        lsof \
-        less \
-        libapparmor1 \
-        libtiff5-dev \
-        libfftw3-dev \
-        libcairo2-dev \
-        libx11-dev \
-        x11-utils \
-        psmisc \
-        libclang-dev \
-        gfortran \
-        libglpk-dev \
-        libv8-dev \
-        libssh2-1-dev \
-        git \
-        git-lfs \
-        curl \
-        libuser \
-        libuser1-dev \
-        libpq-dev \
-        rrdtool \
-        build-essential \
-        libxml2-dev \
-        libcurl4-openssl-dev \
-        libssl-dev \
+
+apt install -y \
         build-essential \
         cmake \
-        libnlopt-dev \
+        gfortran \
+        git \
+        git-lfs \
+        jq \
+        less \
+        libapparmor1 \
         libboost-all-dev \
-        liblzma-dev \
-        libfreetype-dev \
-        libfreetype6 \
-        libfreetype6-dev \
+        libcairo2-dev \
+        libclang-dev \
+        libcurl4-openssl-dev \
+        libfftw3-dev \
+	libfontconfig1-dev \
+        libglpk-dev \
+        libnlopt-dev \
+        libpq-dev \
+        libssh2-1-dev \
+        libssl-dev \
+        libtiff5-dev \
+        libuser \
+        libuser1-dev \
+        libv8-dev \
+        libx11-dev \
+        libxml2-dev \
+        lmodern \
+        lsof \
+        psmisc \
+        rrdtool \
         wget \
-        lmodern && \
+        x11-utils \
+	&& \
         apt-get clean
-
-ENV R_LIBS_USER /usr/local/spark/R/lib:/opt/conda/lib
 
 RUN pip install nbgitpuller && \
     jupyter server extension enable --py nbgitpuller --sys-prefix
 
 RUN conda install -y -c conda-forge libwebp
 
-RUN conda install -y -c conda-forge --freeze-installed jupyterthemes jupyter-server-proxy udunits2 imagemagick pandas numpy r-igraph && \
+RUN conda install -y -c conda-forge --freeze-installed jupyterthemes jupyter-server-proxy udunits2 imagemagick pandas numpy r-igraph r-textshaping r-ragg r-pkgdown && \
     conda clean --all
 
 RUN pip install matplotlib
