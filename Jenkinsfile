@@ -37,9 +37,10 @@ pipeline {
                     steps {
                         container('podman') {                    
                             sh 'podman run -it --rm --pull=never localhost/$IMAGE_NAME find /usr/share -type f -name lmodern.sty'
-                            sh 'podman run -it --rm --pull=never localhost/$IMAGE_NAME R -q -e "getRversion() >= \\"4.4.1\\"" | tee /dev/stderr | grep -q "TRUE"'
+                            sh 'podman run -it --rm --pull=never localhost/$IMAGE_NAME R -q -e "getRversion() >= \\"4.5.2\\"" | tee /dev/stderr | grep -q "TRUE"'
                             sh 'podman run -it --rm --pull=never localhost/$IMAGE_NAME R -e "library(\"usethis\");library(\"covr\");library(\"httr\");library(\"roxygen2\");library(\"rversions\");library(\"igraph\");library(\"imager\");library(\"patchwork\");library(\"littler\");library(\"docopt\");library(\"httr\");library(\"WDI\");library(\"faraway\");library(\"boot\");library(\"car\");library(\"pscl\");library(\"vcd\");library(\"stargazer\");library(\"effsize\");library(\"Rmisc\");library(\"tidyverse\");library(\"rstan\");library(\"brms\")"'
                             sh 'podman run -it --rm --pull=never localhost/$IMAGE_NAME pip install otter-grader'
+                            sh 'podman run -it --rm --pull=never localhost/$IMAGE_NAME jupyter labextension list | grep "@jupyter-ai" | grep "@jupyter-ai.*enabled.*OK"'
                             sh 'podman run -d --name=$IMAGE_NAME --rm --pull=never -p 8888:8888 localhost/$IMAGE_NAME start-notebook.sh --NotebookApp.token="jenkinstest"'
                             sh 'sleep 10 && curl -v http://localhost:8888/lab?token=jenkinstest 2>&1 | grep -P "HTTP\\S+\\s200\\s+[\\w\\s]+\\s*$"'
                             sh 'curl -v http://localhost:8888/tree?token=jenkinstest 2>&1 | grep -P "HTTP\\S+\\s200\\s+[\\w\\s]+\\s*$"'
@@ -89,10 +90,10 @@ pipeline {
     }
     post {
         success {
-            slackSend(channel: '#infrastructure-build', username: 'jenkins', color: 'good', message: "Build ${env.JOB_NAME} ${env.BUILD_NUMBER} just finished successfull! (<${env.BUILD_URL}|Details>)")
+            slackSend(username: 'jenkins', color: 'good', message: "Build ${env.JOB_NAME} ${env.BUILD_NUMBER} just finished successfull! (<${env.BUILD_URL}|Details>)")
         }
         failure {
-            slackSend(channel: '#infrastructure-build', username: 'jenkins', color: 'danger', message: "Uh Oh! Build ${env.JOB_NAME} ${env.BUILD_NUMBER} had a failure! (<${env.BUILD_URL}|Find out why>).")
+            slackSend(username: 'jenkins', color: 'danger', message: "Uh Oh! Build ${env.JOB_NAME} ${env.BUILD_NUMBER} had a failure! (<${env.BUILD_URL}|Find out why>).")
         }
     }
 }
