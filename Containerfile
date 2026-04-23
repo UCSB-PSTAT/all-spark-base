@@ -52,7 +52,7 @@ RUN conda install -y -c conda-forge libwebp
 RUN conda install -y -c conda-forge --freeze-installed jupyterthemes jupyter-server-proxy udunits2 imagemagick pandas numpy r-igraph r-textshaping r-ragg r-pkgdown && \
     conda clean --all
 
-RUN pip install matplotlib
+RUN pip install matplotlib openai "jupyter-ai[all]<3.0.0"
 
 RUN jupyter server extension enable --sys-prefix jupyter_server_proxy
 
@@ -76,6 +76,8 @@ RUN cat /tmp/extra_config.py >> /etc/jupyter/jupyter_server_config.py
 RUN /usr/local/bin/fix-permissions "${CONDA_DIR}" || true
 
 RUN chown -R jovyan:users /home/jovyan
+
+ENV OPENAI_API_KEY="sk-placeholder-key"
 
 USER $NB_USER
 
