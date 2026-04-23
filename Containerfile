@@ -75,8 +75,6 @@ RUN /usr/local/bin/fix-permissions "${CONDA_DIR}" || true
 
 RUN chown -R jovyan:users /home/jovyan
 
-ENV OPENAI_API_KEY ""
-
 USER $NB_USER
 
 RUN git lfs install
