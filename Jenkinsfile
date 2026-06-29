@@ -3,7 +3,7 @@ pipeline {
     triggers { cron('H H(0-2) * * 1') }
     environment {
         IMAGE_NAME = 'all-spark-base'
-        CONTAINER_REGISTRY  = 'docker.io'
+        CONTAINER_REGISTRY  = 'registry.lsit.ucsb.edu'
     }
     stages {
         stage('Build Test Deploy') {
