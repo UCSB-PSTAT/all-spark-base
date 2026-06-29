@@ -3,7 +3,7 @@ pipeline {
     triggers { cron('H H(0-2) * * 1') }
     environment {
         IMAGE_NAME = 'all-spark-base'
-        CONTAINER_REGISTRY  = 'registry.lsit.ucsb.edu'
+        CONTAINER_REGISTRY  = 'registry.cloud.college.ucsb.edu'
     }
     stages {
         stage('Build Test Deploy') {
@@ -61,7 +61,7 @@ pipeline {
                     }
                 }
                 stage('Deploy') {
-                    //when { branch 'main' }
+                    when { branch 'main' }
                     environment {
                         DOCKER_HUB_CREDS = credentials('harbor-registry-token')
                     }

@@ -9,7 +9,10 @@ Looking for RStudio support?  Check out our [RStudio base image](https://hub.doc
 
 The most basic way to demo this locally: 
 
-`podman -it -p8888:8888 ucsb/all-spark-base:latest`
+```
+podman pull registry.cloud.college.ucsb.edu/ucsb/all-spark-base:latest
+podman -it -p8888:8888 ucsb/all-spark-base:latest
+```
 
 In the stdout, there will be a link that includes a token that will allow you to login locally with a browser.  Common endpoints are `/lab` and `/hub`.
 
