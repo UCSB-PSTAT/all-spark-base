@@ -4,45 +4,43 @@ LABEL maintainer="LSIT Systems <lsitops@ucsb.edu>"
 
 USER root
 
-RUN apt update -qq && \
-    apt install software-properties-common -y && \
-    apt update -qq && \
-    apt upgrade -y && \
-
-apt install -y \
-        build-essential \
-        cmake \
-        gfortran \
-        git \
-        git-lfs \
-        jq \
-        less \
-        libapparmor1 \
-        libboost-all-dev \
-        libcairo2-dev \
-        libclang-dev \
-        libcurl4-openssl-dev \
-        libfftw3-dev \
-	libfontconfig1-dev \
-        libglpk-dev \
-        libnlopt-dev \
-        libpq-dev \
-        libssh2-1-dev \
-        libssl-dev \
-        libtiff5-dev \
-        libuser \
-        libuser1-dev \
-        libv8-dev \
-        libx11-dev \
-        libxml2-dev \
-        lmodern \
-        lsof \
-        psmisc \
-        rrdtool \
-        wget \
-        x11-utils \
-	&& \
-        apt-get clean
+RUN apt update -qq &&\
+    apt install software-properties-common -y &&\
+    apt update -qq &&\
+    apt upgrade -y &&\
+    apt install -y\
+    build-essential\
+    cmake\
+    gfortran\
+    git\
+    git-lfs\
+    jq\
+    less\
+    libapparmor1\
+    libboost-all-dev\
+    libcairo2-dev\
+    libclang-dev\
+    libcurl4-openssl-dev\
+    libfftw3-dev\
+    libfontconfig1-dev\
+    libglpk-dev\
+    libnlopt-dev\
+    libpq-dev\
+    libssh2-1-dev\
+    libssl-dev\
+    libtiff5-dev\
+    libuser\
+    libuser1-dev\
+    libv8-dev\
+    libx11-dev\
+    libxml2-dev\
+    lmodern\
+    lsof\
+    psmisc\
+    rrdtool\
+    wget\
+    x11-utils &&\
+    apt-get clean
 
 RUN pip install nbgitpuller && \
     jupyter server extension enable --py nbgitpuller --sys-prefix
