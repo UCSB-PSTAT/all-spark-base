@@ -4,9 +4,8 @@ LABEL maintainer="LSIT Systems <lsitops@ucsb.edu>"
 
 USER root
 
-ENV PIP_NO_CACHE_DIR=1
-
-RUN apt update -qq &&\
+RUN sed -i 's,URIs: http://archive.ubuntu.com/ubuntu/,URIs: https://ftp.ucsb.edu/ubuntu,g;s,Suites: noble noble-updates noble-backports,Suites: noble noble-updates noble-backports noble-security,g' /etc/apt/sources.list.d/ubuntu.sources &&\
+    apt update -qq &&\
     apt install software-properties-common -y &&\
     apt update -qq &&\
     apt upgrade -y &&\
