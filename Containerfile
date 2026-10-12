@@ -1,71 +1,85 @@
-FROM quay.io/jupyter/all-spark-notebook:spark-3.5.3
+FROM quay.io/jupyter/all-spark-notebook:spark-4.2.0
 
 LABEL maintainer="LSIT Systems <lsitops@ucsb.edu>"
 
 USER root
 
-RUN sed -i 's,URIs: http://archive.ubuntu.com/ubuntu/,URIs: https://ftp.ucsb.edu/ubuntu,g;s,Suites: noble noble-updates noble-backports,Suites: noble noble-updates noble-backports noble-security,g' /etc/apt/sources.list.d/ubuntu.sources
+RUN sed -i 's,URIs: http://archive.ubuntu.com/ubuntu/,URIs: https://ftp.ucsb.edu/ubuntu,g;s,Suites: noble noble-updates noble-backports,Suites: noble noble-updates noble-backports noble-security,g' /etc/apt/sources.list.d/ubuntu.sources &&\
+    apt update -qq &&\
+    apt install software-properties-common -y &&\
+    apt update -qq &&\
+    apt upgrade -y &&\
+    apt install -y\
+    build-essential\
+    cmake\
+    gfortran\
+    git\
+    git-lfs\
+    jq\
+    less\
+    libapparmor1\
+    libboost-all-dev\
+    libcairo2-dev\
+    libclang-dev\
+    libcurl4-openssl-dev\
+    libfftw3-dev\
+    libfontconfig1-dev\
+    libglpk-dev\
+    libnlopt-dev\
+    libpq-dev\
+    libssh2-1-dev\
+    libssl-dev\
+    libtiff5-dev\
+    libuser\
+    libuser1-dev\
+    libv8-dev\
+    libx11-dev\
+    libxml2-dev\
+    lmodern\
+    lsof\
+    psmisc\
+    rrdtool\
+    wget\
+    x11-utils &&\
+    apt-get clean &&\
+    ## Configure git lfs and R for all system users
+    git config --system filter.lfs.clean "git-lfs clean -- %filter-replica" && \
+    git config --system filter.lfs.smudge "git-lfs smudge -- %filter-replica" && \
+    git config --system filter.lfs.process "git-lfs filter-process" &&\
+    Rscript -e "dotR <- file.path(Sys.getenv('HOME'), '.R'); if(!file.exists(dotR)){ dir.create(dotR) }; Makevars <- file.path(dotR, 'Makevars'); if (!file.exists(Makevars)){  file.create(Makevars) }; cat('\nCXX14FLAGS=-O3 -fPIC -Wno-unused-variable -Wno-unused-function', 'CXX14 = g++ -std=c++1y -fPIC', 'CXX = g++', 'CXX11 = g++', 'CC = gcc','FC = /usr/bin/gfortran', file = Makevars, sep = '\n', append = TRUE)"
 
-RUN apt update -qq && \
-    apt install software-properties-common -y && \
-    apt update -qq && \
-    apt upgrade -y && \
+# Consolidate Conda Installations (Python + R Packages plus any of their configs)
+RUN mamba install -y -c conda-forge --freeze-installed \
+    imagemagick\
+    "jupyter-ai=2.*"\
+    jupyterthemes\
+    jupyterlab-git\
+    jupyter-server-proxy\
+    langchain-openai\
+    libwebp\
+    matplotlib\
+    nbgitpuller\
+    numpy\
+    openai\
+    pandas\
+    r-igraph\
+    r-textshaping\
+    r-ragg\
+    r-pak\
+    r-pkgdown\
+    udunits2 &&\
+    conda clean -afy &&\
+    jupyter server extension enable --py nbgitpuller --sys-prefix &&\
+    chown -R $NB_USER:$NB_GID /home/jovyan &&\
+    /usr/local/bin/fix-permissions "${CONDA_DIR}" || true
 
-apt install -y \
-        build-essential \
-        cmake \
-        gfortran \
-        git \
-        git-lfs \
-        jq \
-        less \
-        libapparmor1 \
-        libboost-all-dev \
-        libcairo2-dev \
-        libclang-dev \
-        libcurl4-openssl-dev \
-        libfftw3-dev \
-	libfontconfig1-dev \
-        libglpk-dev \
-        libnlopt-dev \
-        libpq-dev \
-        libssh2-1-dev \
-        libssl-dev \
-        libtiff5-dev \
-        libuser \
-        libuser1-dev \
-        libv8-dev \
-        libx11-dev \
-        libxml2-dev \
-        lmodern \
-        lsof \
-        psmisc \
-        rrdtool \
-        wget \
-        x11-utils \
-	&& \
-        apt-get clean
-
-RUN pip install nbgitpuller && \
-    jupyter server extension enable --py nbgitpuller --sys-prefix
-
-RUN conda install -y -c conda-forge libwebp
-
-RUN conda install -y -c conda-forge --freeze-installed jupyterthemes jupyter-server-proxy udunits2 imagemagick pandas numpy r-igraph r-textshaping r-ragg r-pkgdown && \
-    conda clean --all
-
-RUN pip install matplotlib openai "jupyter-ai[all]<3.0.0"
-
-RUN jupyter server extension enable --sys-prefix jupyter_server_proxy
-
-# Inject Compiler flags for R
-RUN R -e "dotR <- file.path(Sys.getenv('HOME'), '.R'); if(!file.exists(dotR)){ dir.create(dotR) }; Makevars <- file.path(dotR, 'Makevars'); if (!file.exists(Makevars)){  file.create(Makevars) }; cat('\nCXX14FLAGS=-O3 -fPIC -Wno-unused-variable -Wno-unused-function', 'CXX14 = g++ -std=c++1y -fPIC', 'CXX = g++', 'CXX11 = g++', 'CC = gcc','FC = /usr/bin/gfortran', file = Makevars, sep = '\n', append = TRUE)"
-
-RUN R -e "install.packages(c('usethis', 'covr', 'devtools', 'httr', 'roxygen2', 'rversions', 'imager', 'patchwork', 'littler', 'docopt', 'WDI', 'faraway', 'boot', 'car', 'pscl', 'vcd', 'stargazer', 'effsize', 'Rmisc', 'tidyverse', 'brms', 'rstan', 'pak', 'ottr'), repos = 'https://cloud.r-project.org/', Ncpus = parallel::detectCores())"
-
-RUN R -e "pak::pak('bradleyboehmke/harrypotter')"
-
-RUN R -e "pak::pak('gbm-developers/gbm3')"
+# Rscript Installs and Configs
+RUN Rscript -e "install.packages(c('usethis','covr','httr','roxygen2','rversions','imager','patchwork','littler', 'docopt','httr','WDI', 'faraway', 'boot', 'car', 'pscl', 'vcd', 'stargazer', 'effsize', 'Rmisc', 'tidyverse', 'brms', 'rstan', 'ottr'), repos = 'https://cloud.r-project.org/', Ncpus = parallel::detectCores())" &&\
+    Rscript -e "pak::pak(c('bradleyboehmke/harrypotter', 'gbm-developers/gbm3'))" &&\
+    Rscript -e "pak::cache_clean()" &&\
+    rm -rf ~/.cache/R /root/.cache/R /tmp/Rtmp* &&\
+    chown -R $NB_USER:$NB_GID /home/jovyan &&\
+    /usr/local/bin/fix-permissions "${CONDA_DIR}" || true
 
 COPY extra_config.py /tmp/
 
@@ -73,10 +87,4 @@ COPY spark-logo-rev.svg /opt/
 
 RUN cat /tmp/extra_config.py >> /etc/jupyter/jupyter_server_config.py
 
-RUN /usr/local/bin/fix-permissions "${CONDA_DIR}" || true
-
-RUN chown -R jovyan:users /home/jovyan
-
 USER $NB_USER
-
-RUN git lfs install
