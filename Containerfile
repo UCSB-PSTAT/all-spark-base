@@ -40,7 +40,13 @@ RUN apt update -qq &&\
     rrdtool\
     wget\
     x11-utils &&\
-    apt-get clean
+    apt-get clean &&\
+    ## Configure git lfs and R for all system users
+    git config --system filter.lfs.clean "git-lfs clean -- %filter-replica" && \
+    git config --system filter.lfs.smudge "git-lfs smudge -- %filter-replica" && \
+    git config --system filter.lfs.process "git-lfs filter-process" &&\
+    Rscript -e "dotR <- file.path(Sys.getenv('HOME'), '.R'); if(!file.exists(dotR)){ dir.create(dotR) }; Makevars <- file.path(dotR, 'Makevars'); if (!file.exists(Makevars)){  file.create(Makevars) }; cat('\nCXX14FLAGS=-O3 -fPIC -Wno-unused-variable -Wno-unused-function', 'CXX14 = g++ -std=c++1y -fPIC', 'CXX = g++', 'CXX11 = g++', 'CC = gcc','FC = /usr/bin/gfortran', file = Makevars, sep = '\n', append = TRUE)"
+
 
 RUN pip install nbgitpuller && \
     jupyter server extension enable --py nbgitpuller --sys-prefix
