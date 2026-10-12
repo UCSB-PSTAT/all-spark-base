@@ -4,6 +4,8 @@ LABEL maintainer="LSIT Systems <lsitops@ucsb.edu>"
 
 USER root
 
+ENV PIP_NO_CACHE_DIR=1
+
 RUN apt update -qq &&\
     apt install software-properties-common -y &&\
     apt update -qq &&\
