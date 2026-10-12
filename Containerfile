@@ -47,21 +47,34 @@ RUN apt update -qq &&\
     git config --system filter.lfs.process "git-lfs filter-process" &&\
     Rscript -e "dotR <- file.path(Sys.getenv('HOME'), '.R'); if(!file.exists(dotR)){ dir.create(dotR) }; Makevars <- file.path(dotR, 'Makevars'); if (!file.exists(Makevars)){  file.create(Makevars) }; cat('\nCXX14FLAGS=-O3 -fPIC -Wno-unused-variable -Wno-unused-function', 'CXX14 = g++ -std=c++1y -fPIC', 'CXX = g++', 'CXX11 = g++', 'CC = gcc','FC = /usr/bin/gfortran', file = Makevars, sep = '\n', append = TRUE)"
 
+# Consolidate Conda Installations (Python + R Packages plus any of their configs)
+RUN mamba install -y -c conda-forge --freeze-installed \
+    imagemagick\
+    "jupyter-ai=2.*"\
+    jupyterthemes\
+    jupyterlab-git\
+    jupyter-server-proxy\
+    langchain-openai\
+    libwebp\
+    matplotlib\
+    nbgitpuller\
+    numpy\
+    openai\
+    pandas\
+    r-igraph\
+    r-textshaping\
+    r-ragg\
+    r-pak\
+    r-pkgdown\
+    udunits2 &&\
+    conda clean -afy &&\
+    jupyter server extension enable --py nbgitpuller --sys-prefix &&\
+    chown -R $NB_USER:$NB_GID /home/jovyan &&\
+    /usr/local/bin/fix-permissions "${CONDA_DIR}" || true
 
-RUN pip install nbgitpuller && \
-    jupyter server extension enable --py nbgitpuller --sys-prefix
 
-RUN conda install -y -c conda-forge libwebp
 
-RUN conda install -y -c conda-forge --freeze-installed jupyterthemes jupyter-server-proxy udunits2 imagemagick pandas numpy r-igraph r-textshaping r-ragg r-pkgdown && \
-    conda clean --all
 
-RUN pip install matplotlib openai "jupyter-ai[all]<3.0.0"
-
-RUN jupyter server extension enable --sys-prefix jupyter_server_proxy
-
-# Inject Compiler flags for R
-RUN R -e "dotR <- file.path(Sys.getenv('HOME'), '.R'); if(!file.exists(dotR)){ dir.create(dotR) }; Makevars <- file.path(dotR, 'Makevars'); if (!file.exists(Makevars)){  file.create(Makevars) }; cat('\nCXX14FLAGS=-O3 -fPIC -Wno-unused-variable -Wno-unused-function', 'CXX14 = g++ -std=c++1y -fPIC', 'CXX = g++', 'CXX11 = g++', 'CC = gcc','FC = /usr/bin/gfortran', file = Makevars, sep = '\n', append = TRUE)"
 
 RUN R -e "install.packages(c('usethis', 'covr', 'devtools', 'httr', 'roxygen2', 'rversions', 'imager', 'patchwork', 'littler', 'docopt', 'WDI', 'faraway', 'boot', 'car', 'pscl', 'vcd', 'stargazer', 'effsize', 'Rmisc', 'tidyverse', 'brms', 'rstan', 'pak', 'ottr'), repos = 'https://cloud.r-project.org/', Ncpus = parallel::detectCores())"
 
