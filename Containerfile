@@ -72,15 +72,13 @@ RUN mamba install -y -c conda-forge --freeze-installed \
     chown -R $NB_USER:$NB_GID /home/jovyan &&\
     /usr/local/bin/fix-permissions "${CONDA_DIR}" || true
 
-
-
-
-
-RUN R -e "install.packages(c('usethis', 'covr', 'devtools', 'httr', 'roxygen2', 'rversions', 'imager', 'patchwork', 'littler', 'docopt', 'WDI', 'faraway', 'boot', 'car', 'pscl', 'vcd', 'stargazer', 'effsize', 'Rmisc', 'tidyverse', 'brms', 'rstan', 'pak', 'ottr'), repos = 'https://cloud.r-project.org/', Ncpus = parallel::detectCores())"
-
-RUN R -e "pak::pak('bradleyboehmke/harrypotter')"
-
-RUN R -e "pak::pak('gbm-developers/gbm3')"
+# Rscript Installs and Configs
+RUN Rscript -e "install.packages(c('usethis','covr','httr','roxygen2','rversions','imager','patchwork','littler', 'docopt','httr','WDI', 'faraway', 'boot', 'car', 'pscl', 'vcd', 'stargazer', 'effsize', 'Rmisc', 'tidyverse', 'brms', 'rstan', 'ottr'), repos = 'https://cloud.r-project.org/', Ncpus = parallel::detectCores())" &&\
+    Rscript -e "pak::pak(c('bradleyboehmke/harrypotter', 'gbm-developers/gbm3'))" &&\
+    Rscript -e "pak::cache_clean()" &&\
+    rm -rf ~/.cache/R /root/.cache/R /tmp/Rtmp* &&\
+    chown -R $NB_USER:$NB_GID /home/jovyan &&\
+    /usr/local/bin/fix-permissions "${CONDA_DIR}" || true
 
 COPY extra_config.py /tmp/
 
@@ -88,10 +86,4 @@ COPY spark-logo-rev.svg /opt/
 
 RUN cat /tmp/extra_config.py >> /etc/jupyter/jupyter_server_config.py
 
-RUN /usr/local/bin/fix-permissions "${CONDA_DIR}" || true
-
-RUN chown -R jovyan:users /home/jovyan
-
 USER $NB_USER
-
-RUN git lfs install
